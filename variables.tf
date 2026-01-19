@@ -220,6 +220,13 @@ DESCRIPTION
     ])
     error_message = "All backup policies must have a valid type: disk, blob, kubernetes, postgresql, or postgresql_flexible."
   }
+  validation {
+    condition = alltrue([
+      for k, policy in var.backup_policies :
+      length(policy.backup_repeating_time_intervals) > 0
+    ])
+    error_message = "All backup policies must specify at least one backup_repeating_time_intervals value. Example: [\"R/2024-01-01T00:00:00+00:00/P1D\"] for daily backups."
+  }
 }
 
 variable "backup_repeating_time_intervals" {
