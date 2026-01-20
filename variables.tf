@@ -227,6 +227,16 @@ DESCRIPTION
     ])
     error_message = "All backup policies must specify at least one backup_repeating_time_intervals value. Example: [\"R/2024-01-01T00:00:00+00:00/P1D\"] for daily backups."
   }
+  validation {
+    condition = alltrue([
+      for k, policy in var.backup_policies :
+      policy.type != "blob" || alltrue([
+        for interval in policy.backup_repeating_time_intervals :
+        can(regex("\\+00:00", interval))
+      ])
+    ])
+    error_message = "Blob backup policies require UTC timezone (+00:00) in backup_repeating_time_intervals. Example: [\"R/2024-01-01T00:00:00+00:00/P1D\"]."
+  }
 }
 
 variable "backup_repeating_time_intervals" {
